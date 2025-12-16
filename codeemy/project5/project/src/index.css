@@ -1,0 +1,94 @@
+/* 💫 Basic styling for your React Calculator */
+
+body {
+  background: linear-gradient(135deg, #8ec5fc, #e0c3fc);
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.calc-container {
+  background: #ffffffda;
+  padding: 30px 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  text-align: center;
+}
+
+.title {
+  color: #3a3a3a;
+  margin-bottom: 20px;
+}
+
+.display {
+  width: 100%;
+  height: 50px;
+  font-size: 22px;
+  text-align: right;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 20px;
+  background: #f1f1f1;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.btn {
+  height: 50px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  background: #fafafa;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+  background: #e5e5e5;
+  transform: scale(1.05);
+}
+
+.equals {
+  background: #4CAF50;
+  color: white;
+}
+
+.equals:hover {
+  background: #45a049;
+}
+
+.clear {
+  background: #f44336;
+  color: white;
+}
+
+.clear:hover {
+  background: #d32f2f;
+}
+
+.delete {
+  background: #ff9800;
+  color: white;
+}
+
+.delete:hover {
+  background: #fb8c00;
+}
+
+/* 🧠 Responsive tweak */
+@media (max-width: 400px) {
+  .calc-container {
+    width: 90%;
+  }
+}

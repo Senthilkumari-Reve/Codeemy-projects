@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Interactive Todo App — Explained</title>
+  <style>
+    /* Simple friendly styling so this is usable without external files */
+    :root{--bg:#f7f9fc;--card:#ffffff;--accent:#2563eb;--muted:#6b7280}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:0;min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+    .wrap{width:100%;max-width:720px}
+    .card{background:var(--card);border-radius:10px;padding:20px;box-shadow:0 6px 20px rgba(2,6,23,0.08)}
+    h1{margin:0 0 6px;font-size:1.25rem}
+    p.lead{margin:0 0 14px;color:var(--muted)}
+    .controls{display:flex;gap:8px}
+    input[type=text]{flex:1;padding:10px;border:1px solid #e6eef6;border-radius:8px}
+    button{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:white;cursor:pointer}
+    ul{list-style:none;padding:0;margin:16px 0;max-height:42vh;overflow:auto}
+    li{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;border:1px solid #eef2ff;margin-bottom:8px}
+    li .txt{flex:1}
+    .meta{display:flex;gap:8px}
+    .ghost{background:transparent;border:0;color:var(--muted);cursor:pointer}
+    .completed .txt{opacity:.6;text-decoration:line-through}
+    footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:0.9rem}
+    @media (max-width:520px){.controls{flex-direction:column} button{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <h1>Interactive Todo — Starter</h1>
+      <p class="lead">Tiny app using only HTML, CSS and JavaScript. All code lives in this file.</p>
+
+      <!-- INPUTS -->
+      <div class="controls">
+        <input id="todoInput" type="text" placeholder="Add a task and press Add or Enter" aria-label="New todo" />
+        <button id="addBtn">Add</button>
+        <select id="filter" aria-label="Filter todos">
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+
+      <!-- TODO LIST -->
+      <ul id="list" aria-live="polite"></ul>
+
+      <footer>
+        <div id="status">0 items</div>
+        <div>
+          <button id="clearCompleted" class="ghost">Clear completed</button>
+          <button id="reset" class="ghost">Reset</button>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    /* ======= App JavaScript (all-in-one for learning) =======
+       Key functions: init, render, create, toggle, edit, delete, save
+    */
+
+    // Element refs
+    const input = document.getElementById('todoInput');
+    const addBtn = document.getElementById('addBtn');
+    const list = document.getElementById('list');
+    const status = document.getElementById('status');
+    const clearCompletedBtn = document.getElementById('clearCompleted');
+    const resetBtn = document.getElementById('reset');
+    const filterSelect = document.getElementById('filter');
+
+    // App state
+    let todos = JSON.parse(localStorage.getItem('interactive_todos') || '[]');
+
+    // Utility: generate short id
+    function uid(){ return Math.random().toString(36).slice(2,9); }
+
+    // Save to localStorage
+    function save(){ localStorage.setItem('interactive_todos', JSON.stringify(todos)); }
+
+    // Render function: builds the list from state
+    function render(){
+      const filter = filterSelect.value;
+      const visible = todos.filter(t => filter === 'all' || (filter === 'active' && !t.done) || (filter === 'completed' && t.done));
+
+      if(visible.length === 0){
+        list.innerHTML = '<li style="opacity:.7">No tasks — add your first task ✨</li>';
+      } else {
+        list.innerHTML = visible.map(t => `
+          <li data-id="${t.id}" class="${t.done ? 'completed' : ''}">
+            <input type="checkbox" class="chk" ${t.done ? 'checked' : ''} aria-label="Mark done" />
+            <div class="txt" contenteditable="false" role="textbox" aria-label="Task">${escapeHtml(t.text)}</div>
+            <div class="meta">
+              <button class="ghost edit">✎</button>
+              <button class="ghost del">✕</button>
+            </div>
+          </li>
+        `).join('');
+      }
+
+      // update counters
+      const activeCount = todos.filter(t => !t.done).length;
+      status.textContent = `${activeCount} item${activeCount===1 ? '' : 's'}`;
+
+      // bind events after building DOM
+      list.querySelectorAll('li').forEach(li => {
+        const id = li.dataset.id;
+        const chk = li.querySelector('.chk');
+        const del = li.querySelector('.del');
+        const editBtn = li.querySelector('.edit');
+        const txt = li.querySelector('.txt');
+
+        chk.addEventListener('change', () => toggle(id));
+        del.addEventListener('click', () => remove(id));
+
+        // edit flow: click edit -> make contenteditable -> save on blur or Enter
+        editBtn.addEventListener('click', () => {
+          txt.contentEditable = 'true';
+          txt.focus();
+          // move caret to end
+          document.execCommand('selectAll', false, null);
+          document.getSelection().collapseToEnd();
+        });
+
+        txt.addEventListener('keydown', (e) => {
+          if(e.key === 'Enter'){
+            e.preventDefault();
+            txt.blur();
+          }
+        });
+
+        txt.addEventListener('blur', () => {
+          if(txt.isContentEditable){
+            const newText = txt.textContent.trim();
+            updateText(id, newText || '(empty)');
+            txt.contentEditable = 'false';
+          }
+        });
+      });
+
+      save();
+    }
+
+    // Escape user text for safety in render
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s]);
+    }
+
+    // Action: add todo
+    function add(){
+      const txt = input.value.trim();
+      if(!txt) { input.focus(); return; }
+      todos.unshift({ id: uid(), text: txt, done: false, created: Date.now() });
+      input.value = '';
+      render();
+    }
+
+    // Action: toggle done
+    function toggle(id){
+      todos = todos.map(t => t.id === id ? {...t, done: !t.done} : t);
+      render();
+    }
+
+    // Action: remove
+    function remove(id){
+      todos = todos.filter(t => t.id !== id);
+      render();
+    }
+
+    // Update text after edit
+    function updateText(id, newText){
+      todos = todos.map(t => t.id === id ? {...t, text: newText} : t);
+      render();
+    }
+
+    // Clear completed
+    clearCompletedBtn.addEventListener('click', () => { todos = todos.filter(t => !t.done); render(); });
+
+    // Reset all with confirmation
+    resetBtn.addEventListener('click', () => { if(confirm('Reset all todos?')){ todos = []; render(); } });
+
+    // Input bindings
+    addBtn.addEventListener('click', add);
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') add(); });
+    filterSelect.addEventListener('change', render);
+
+    // Initial render when page loads
+    render();
+  </script>
+</body>
+</html>

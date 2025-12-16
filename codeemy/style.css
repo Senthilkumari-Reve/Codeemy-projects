@@ -1,0 +1,97 @@
+/* Reset and base styling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #f8f9fc;
+  color: #222;
+  line-height: 1.6;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Header */
+header {
+  padding: 50px 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border-radius: 15px;
+  margin-bottom: 40px;
+}
+
+header h1 span {
+  color: #ffe26f;
+}
+
+header p {
+  font-size: 1.1rem;
+  margin-top: 10px;
+}
+
+/* Sections */
+section {
+  margin: 40px 0;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #667eea;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+/* About */
+#about p {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Skills */
+ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+ul li {
+  background: #667eea;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+ul li:hover {
+  background: #764ba2;
+}
+
+
+/* Contact */
+.btn {
+  display: inline-block;
+  background: #667eea;
+  color: white;
+  padding: 10px 25px;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #764ba2;
+}
+
+/* Footer */
+footer {
+  margin-top: 40px;
+  font-size: 0.9rem;
+  color: #666;
+}
