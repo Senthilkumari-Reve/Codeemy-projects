@@ -1,0 +1,35 @@
+<!-- static/index.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TODO App — Demo</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Roboto, "Segoe UI", sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+    input, textarea { width: 100%; padding: 8px; margin: 6px 0; box-sizing: border-box; }
+    .todo { border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+    .done { opacity: 0.6; text-decoration: line-through; }
+    button { padding: 8px 12px; margin-right: 6px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>TODO App (demo)</h1>
+
+  <section>
+    <h2>Create a todo</h2>
+    <input id="title" placeholder="Title" />
+    <textarea id="description" rows="3" placeholder="Description (optional)"></textarea>
+    <button onclick="createTodo()">Create</button>
+  </section>
+
+  <hr/>
+
+  <section>
+    <h2>Todos</h2>
+    <div id="todos"></div>
+  </section>
+
+  <script src="/static/app.js"></script>
+
+</body>
+</html>
